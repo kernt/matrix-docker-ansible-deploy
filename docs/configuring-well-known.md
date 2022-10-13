@@ -8,7 +8,6 @@ There are 2 types of well-known service discovery that Matrix makes use of:
 
 - (not that important) **Client Server discovery** (`/.well-known/matrix/client`) -- assists programs that you use to connect to your server (e.g. Element), so that they can make it more convenient for you by automatically configuring the "Homeserver URL" and "Identity Server URL" addresses. Learn more in [Introduction to Client Server Discovery](#introduction-to-client-server-discovery)
 
-
 ## Introduction to Federation Server Discovery
 
 All services created by this playbook are meant to be installed on their own server (such as `matrix.<your-domain>`).
@@ -22,7 +21,6 @@ For simplicity reasons, our setup advocates for the `/.well-known/matrix/server`
 
 To learn how to set up `/.well-known/matrix/server`, read the Installing section below.
 
-
 ## Introduction to Client Server Discovery
 
 Client Server Service discovery lets various client programs which support it, to receive a full user id (e.g. `@username:example.com`) and determine where the Matrix server is automatically (e.g. `https://matrix.example.com`).
@@ -35,7 +33,6 @@ However, this playbook installs your Matrix server on another domain (e.g. `matr
 
 To learn how to set it up, read the Installing section below.
 
-
 ## (Optional) Introduction to Homeserver Admin Contact and Support page
 
 [MSC 1929](https://github.com/matrix-org/matrix-spec-proposals/pull/1929) specifies a way to add contact details of admins, as well as a link to a support page for users who are having issues with the service.
@@ -45,7 +42,8 @@ This MSC did not get accepted yet, but we think it might already be useful to Ho
 The two playbook variables that you could look for, if you're interested in being an early adopter, are: `matrix_homeserver_admin_contacts` and `matrix_homeserver_support_url`.
 
 Example snippet for `vars.yml`:
-```
+
+```yaml
 # Enable generation of `/.well-known/matrix/support`.
 # This needs to be enabled explicitly for now, because MSC 1929 is not yet accepted.
 matrix_well_known_matrix_support_enabled: true
@@ -66,7 +64,6 @@ matrix_homeserver_support_url: "https://example.domain.tld/support"
 
 To learn how to set up `/.well-known/matrix/support` for the base domain, read the Installing section below.
 
-
 ## Installing well-known files on the base domain's server
 
 To implement the two service discovery mechanisms, your base domain's server (e.g. `example.com`) needs to run an HTTPS-capable webserver.
@@ -81,7 +78,6 @@ To make things easy for you to set up, this playbook generates and hosts 2 well-
 
 You have 3 options when it comes to installing the files on the base domain's server:
 
-
 ### (Option 1): **Copying the files manually** to your base domain's server
 
 **Hint**: Option 2 and 3 (below) are generally a better way to do this. Make sure to go with them, if possible.
@@ -95,7 +91,6 @@ All you need to do is:
 This is relatively easy to do and possibly your only choice if you can only host static files from the base domain's server.
 It is, however, **a little fragile**, as future updates performed by this playbook may regenerate the well-known files and you may need to notice that and copy them over again.
 
-
 ### (Option 2): **Serving the base domain** from the Matrix server via the playbook
 
 If you don't need the base domain (e.g. `example.com`) for anything else (hosting a website, etc.), you can point it to the Matrix server's IP address and tell the playbook to configure it.
@@ -103,7 +98,6 @@ If you don't need the base domain (e.g. `example.com`) for anything else (hostin
 This is the easiest way to set up well-known serving -- letting the playbook handle the whole base domain for you (including SSL certificates, etc.). However, if you need to use the base domain for other things (such as hosting some website, etc.), going with Option 1 or Option 3 might be more suitable.
 
 See [Serving the base domain](configuring-playbook-base-domain-serving.md) to learn how the playbook can help you set it up.
-
 
 ### (Option 3): **Setting up reverse-proxying** of the well-known files from the base domain's server to the Matrix server
 
@@ -174,21 +168,20 @@ backend matrix-backend
 
 **For Netlify**, it would be something like this:
 
-```
+```shell
 # In the _redirects file in the website's root
 /.well-known/matrix/* https://matrix.example.com/.well-known/matrix/:splat 200!
 ```
 
 **For AWS CloudFront**
 
-   1. Add a custom origin with matrix.<your-domain> to your distribution
+   1. Add a custom origin with `matrix.<your-domain>` to your distribution
    1. Add two behaviors, one for `.well-known/matrix/client` and one for `.well-known/matrix/server` and point them to your new origin.
 
 Make sure to:
 
 - **replace `example.com`** in the server configuration with your actual domain name
 - and: to **do this for the HTTPS-enabled server block**, as that's where Matrix expects the file to be
-
 
 ## Confirming it works
 
